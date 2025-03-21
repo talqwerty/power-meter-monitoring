@@ -1,0 +1,33 @@
+# Docker
+.env
+docker-compose.override.yml
+
+# Laravel
+/laravel/node_modules
+/laravel/public/hot
+/laravel/public/storage
+/laravel/storage/*.key
+/laravel/vendor
+/laravel/.env
+/laravel/.env.backup
+/laravel/.phpunit.result.cache
+/laravel/Homestead.json
+/laravel/Homestead.yaml
+/laravel/npm-debug.log
+/laravel/yarn-error.log
+
+# Node-RED
+/node-red/node_modules
+/node-red/.npm
+/node-red/.node-red
+/node-red/.config.json
+/node-red/.sessions.json
+
+# Database
+/mysql/data/
+
+# IDE files
+.idea
+.vscode
+*.sublime-workspace
+*.sublime-project

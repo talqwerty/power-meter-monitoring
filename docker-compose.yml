@@ -1,0 +1,62 @@
+services:
+  # PHP Laravel Application
+  app:
+    build:
+      context: ./docker/php
+      dockerfile: Dockerfile
+    container_name: power_meter_app
+    volumes:
+      - ./laravel:/var/www/html
+    depends_on:
+      - mysql
+    networks:
+      - app_network
+
+  # Nginx Web Server
+  webserver:
+    image: nginx:alpine
+    container_name: power_meter_webserver
+    volumes:
+      - ./laravel:/var/www/html
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d
+    ports:
+      - "8000:80"
+    depends_on:
+      - app
+    networks:
+      - app_network
+
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: power_meter_mysql
+    volumes:
+      - mysql_data:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: power_meter_db
+      MYSQL_ROOT_PASSWORD: your_root_password
+      MYSQL_USER: power_user
+      MYSQL_PASSWORD: power_password
+    ports:
+      - "3306:3306"
+    networks:
+      - app_network
+
+  # Node-RED for meter simulation and flows
+  nodered:
+    image: nodered/node-red:latest
+    container_name: power_meter_nodered
+    volumes:
+      - nodered_data:/data
+    ports:
+      - "1880:1880"
+    networks:
+      - app_network
+
+networks:
+  app_network:
+    driver: bridge
+
+volumes:
+  mysql_data:
+  nodered_data:
