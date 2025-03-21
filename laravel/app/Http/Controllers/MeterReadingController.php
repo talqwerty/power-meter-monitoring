@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 
 class MeterReadingController extends Controller
 {
+    /**
+     * แสดงรายการข้อมูลการอ่านมิเตอร์
+     */
     public function index(Request $request)
     {
         $query = MeterReading::query();
@@ -29,13 +32,11 @@ class MeterReadingController extends Controller
         return $query->orderBy('created_at', 'desc')->paginate(15);
     }
 
-    public function dashboard()
-    {
-        return view('meter.dashboard');
-    }
-
+    /**
+     * บันทึกข้อมูลการอ่านมิเตอร์
+     */
     public function store(Request $request)
-    { // ยังไม่ได้ใช้
+    {
         $validated = $request->validate([
             'meter_id' => 'required|string',
             'voltage' => 'nullable|numeric',
@@ -44,9 +45,30 @@ class MeterReadingController extends Controller
             'energy' => 'nullable|numeric',
             'frequency' => 'nullable|numeric',
             'power_factor' => 'nullable|numeric',
+
+            // เพิ่มฟิลด์สำหรับข้อมูล 3 เฟส
+            'voltage1' => 'nullable|numeric',
+            'voltage2' => 'nullable|numeric',
+            'voltage3' => 'nullable|numeric',
+            'current1' => 'nullable|numeric',
+            'current2' => 'nullable|numeric',
+            'current3' => 'nullable|numeric',
+            'power1' => 'nullable|numeric',
+            'power2' => 'nullable|numeric',
+            'power3' => 'nullable|numeric',
         ]);
 
         $reading = MeterReading::create($validated);
         return response()->json($reading, 201);
+    }
+
+    /**
+     * แสดงหน้า dashboard สำหรับข้อมูลมิเตอร์
+     */
+    public function dashboard()
+    {
+        // สามารถส่งข้อมูลเริ่มต้นไปยัง view ได้ (ถ้าต้องการ)
+        // แต่เราจะใช้ AJAX เพื่อโหลดข้อมูลในภายหลัง
+        return view('meter.dashboard');
     }
 }
