@@ -8,6 +8,7 @@ Route::get('/', function () {
 });
 
 Route::get('/readings', [MeterReadingController::class, 'index']);
+Route::get('/readings/latest', [MeterReadingController::class, 'latest']);
 Route::get('/meter-dashboard', [MeterReadingController::class, 'dashboard'])->name('meter.dashboard');
 
 Route::post('/readings', [MeterReadingController::class, 'store']); // ยังไม้ใช้

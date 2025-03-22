@@ -8,11 +8,15 @@
     <title>Power Meter Dashboard</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
     <!-- DataTables CSS -->
     <link href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <!-- DataTables Buttons CSS -->
+    <link href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.bootstrap5.min.css" rel="stylesheet">
     <style>
         .header-bg {
-            background-color: #3498db;
+            background-color: black;
             color: white;
             padding: 20px 0;
             margin-bottom: 30px;
@@ -34,17 +38,38 @@
             font-weight: bold;
         }
 
-        .pv31-icon {
-            width: 40px;
-            height: 40px;
-            background-color: #2c3e50;
-            border-radius: 50%;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
+        .dt-buttons {
+            margin-bottom: 15px;
+        }
+
+        .dt-button {
+            margin-right: 5px;
+        }
+
+        button.dt-button:hover:not(.disabled) {
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+        }
+
+        /* ลดขนาดของปุ่ม Export */
+        div.dt-buttons {
+            display: inline-block;
             margin-right: 10px;
+        }
+
+        /* จัดการ layout ของปุ่ม ExportButtons กับ Filter */
+        .dataTables_filter {
+            float: right;
+        }
+        .pagination {
+            --bs-pagination-color: black;
+        }
+
+        .active>.page-link, .page-link.active {
+            background-color: black;
+            border-color: black;
             color: white;
         }
+
     </style>
 </head>
 
@@ -65,7 +90,7 @@
             <!-- Card สรุปข้อมูล PV31_01 -->
             <div class="col-md-6">
                 <div class="card meter-card">
-                    <div class="card-header bg-primary text-white">
+                    <div class="card-header bg-black text-white">
                         Power Meter PV31 Ai205 - #1
                     </div>
                     <div class="card-body">
@@ -76,9 +101,7 @@
                                 <h5>power: <span id="meter1-power">0</span> W</h5>
                             </div>
                             <div class="col-6">
-                                {{-- <h5>energy: <span id="meter1-energy">0</span> kWh</h5>
-                                <h5>frequency: <span id="meter1-frequency">0</span> Hz</h5>
-                                <h5>PF: <span id="meter1-pf">0</span></h5> --}}
+
                             </div>
                         </div>
                     </div>
@@ -88,7 +111,7 @@
             <!-- Card สรุปข้อมูล PV31_02 -->
             <div class="col-md-6">
                 <div class="card meter-card">
-                    <div class="card-header bg-success text-white">
+                    <div class="card-header bg-black text-white">
                         Power Meter PV31 Ai205 - #2
                     </div>
                     <div class="card-body">
@@ -99,9 +122,7 @@
                                 <h5>power: <span id="meter2-power">0</span> W</h5>
                             </div>
                             <div class="col-6">
-                                {{-- <h5>energy: <span id="meter2-energy">0</span> kWh</h5>
-                                <h5>frequency: <span id="meter2-frequency">0</span> Hz</h5>
-                                <h5>PF: <span id="meter2-pf">0</span></h5> --}}
+
                             </div>
                         </div>
                     </div>
@@ -114,9 +135,12 @@
                 <div class="card meter-card">
                     <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
                         <span>Meter Readings Data</span>
-                        <button id="refresh-data" class="btn btn-sm btn-light">
-                            <i class="bi bi-arrow-clockwise"></i> Refresh
-                        </button>
+                        <div>
+                            <span id="total-records" class="me-3">Total Records: 0</span>
+                            <button id="refresh-data" class="btn btn-sm btn-light">
+                                <i class="bi bi-arrow-clockwise"></i> Refresh
+                            </button>
+                        </div>
                     </div>
                     <div class="card-body">
                         <!-- Date Range Filter -->
@@ -131,8 +155,8 @@
                                 <div class="input-group">
                                     <span class="input-group-text">วันที่สิ้นสุด</span>
                                     <input type="date" id="date-end" class="form-control">
-                                    <button id="apply-date-filter" class="btn btn-primary">ค้นหา</button>
-                                    <button id="clear-date-filter" class="btn btn-secondary">ล้าง</button>
+                                    <button id="apply-date-filter" class="btn btn-dark">ค้นหา</button>
+                                    <button id="clear-date-filter" class="btn btn-light">ล้าง</button>
                                 </div>
                             </div>
                         </div>
@@ -146,7 +170,19 @@
                                         <option value="PV31_01">PV31_01</option>
                                         <option value="PV31_02">PV31_02</option>
                                     </select>
-                                    <button id="apply-meter-filter" class="btn btn-primary">กรอง</button>
+                                    <button id="apply-meter-filter" class="btn btn-dark">กรอง</button>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    <span class="input-group-text">จำนวนแถวต่อหน้า</span>
+                                    <select id="page-length" class="form-select">
+                                        <option value="10">10</option>
+                                        <option value="25">25</option>
+                                        <option value="50">50</option>
+                                        <option value="100">100</option>
+                                        <option value="-1">ทั้งหมด</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -165,9 +201,6 @@
                                         <th>Power1 (W)</th>
                                         <th>Power2 (W)</th>
                                         <th>Power3 (W)</th>
-                                        <th>Energy (kWh)</th>
-                                        <th>Frequency (Hz)</th>
-                                        <th>Power Factor</th>
                                         <th>Timestamp</th>
                                     </tr>
                                 </thead>
@@ -187,6 +220,14 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+    <!-- DataTables Buttons JS -->
+    <script src="https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.bootstrap5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.print.min.js"></script>
 
     <script>
         $(document).ready(function() {
@@ -198,19 +239,52 @@
             $('#date-start').val(oneWeekAgo.toISOString().split('T')[0]);
             $('#date-end').val(today.toISOString().split('T')[0]);
 
+            // กำหนดชื่อไฟล์สำหรับ export
+            var getExportFileName = function() {
+                var dateFilter = '';
+                if ($('#date-start').val() && $('#date-end').val()) {
+                    dateFilter = $('#date-start').val() + '_to_' + $('#date-end').val();
+                }
+
+                var meterFilter = $('#meter-filter').val() || 'All_Meters';
+
+                return 'PowerMeterData_' + meterFilter + '_' + dateFilter;
+            };
+
             // ตั้งค่า DataTable
             var table = $('#meter-readings-table').DataTable({
                 processing: true,
-                serverSide: false, // เปลี่ยนเป็น true หากต้องการใช้ server-side processing
+                serverSide: false, // ใช้ client-side processing เพื่อให้ได้ข้อมูลทั้งหมด
+                dom: '<"row"<"col-sm-12 col-md-6"B><"col-sm-12 col-md-6"f>>rt<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"p>>i',
+                buttons: [
+                    {
+                        extend: 'excelHtml5',
+                        text: '<i class="bi bi-file-earmark-excel"></i> Excel',
+                        className: 'btn btn-dark',
+                        title: null,
+                        filename: function() { return getExportFileName(); },
+                        exportOptions: {
+                            columns: ':visible'
+                        }
+                    },
+                    {
+                        extend: 'csvHtml5',
+                        text: '<i class="bi bi-file-earmark-text"></i> CSV',
+                        className: 'btn btn-dark',
+                        title: null,
+                        filename: function() { return getExportFileName(); },
+                        exportOptions: {
+                            columns: ':visible'
+                        }
+                    }
+                ],
                 ajax: {
                     url: '/readings',
-                    dataSrc: 'data',
-                    data: function(d) {
-                        // เพิ่มพารามิเตอร์สำหรับการกรองวันที่และมิเตอร์
-                        d.start_date = $('#date-start').val();
-                        d.end_date = $('#date-end').val();
-                        d.meter_id = $('#meter-filter').val();
-                        return d;
+                    dataSrc: function(response) {
+                        // แสดงจำนวนข้อมูลทั้งหมด
+                        $('#total-records').text('Total Records: ' + response.data.length);
+                        // ส่งกลับข้อมูลทั้งหมดเพื่อให้ DataTable จัดการ
+                        return response.data;
                     }
                 },
                 columns: [{
@@ -220,40 +294,58 @@
                         data: 'meter_id'
                     },
                     {
-                        data: 'voltage1'
+                        data: 'voltage1',
+                        render: function(data) {
+                            return data ? parseFloat(data).toFixed(2) : '0.00';
+                        }
                     },
                     {
-                        data: 'voltage2'
+                        data: 'voltage2',
+                        render: function(data) {
+                            return data ? parseFloat(data).toFixed(2) : '0.00';
+                        }
                     },
                     {
-                        data: 'voltage3'
+                        data: 'voltage3',
+                        render: function(data) {
+                            return data ? parseFloat(data).toFixed(2) : '0.00';
+                        }
                     },
                     {
-                        data: 'current1'
+                        data: 'current1',
+                        render: function(data) {
+                            return data ? parseFloat(data).toFixed(2) : '0.00';
+                        }
                     },
                     {
-                        data: 'current2'
+                        data: 'current2',
+                        render: function(data) {
+                            return data ? parseFloat(data).toFixed(2) : '0.00';
+                        }
                     },
                     {
-                        data: 'current3'
+                        data: 'current3',
+                        render: function(data) {
+                            return data ? parseFloat(data).toFixed(2) : '0.00';
+                        }
                     },
                     {
-                        data: 'power1'
+                        data: 'power1',
+                        render: function(data) {
+                            return data ? parseFloat(data).toFixed(2) : '0.00';
+                        }
                     },
                     {
-                        data: 'power2'
+                        data: 'power2',
+                        render: function(data) {
+                            return data ? parseFloat(data).toFixed(2) : '0.00';
+                        }
                     },
                     {
-                        data: 'power3'
-                    },
-                    {
-                        data: 'energy'
-                    },
-                    {
-                        data: 'frequency'
-                    },
-                    {
-                        data: 'power_factor'
+                        data: 'power3',
+                        render: function(data) {
+                            return data ? parseFloat(data).toFixed(2) : '0.00';
+                        }
                     },
                     {
                         data: 'created_at',
@@ -273,6 +365,10 @@
                     [0, 'desc']
                 ], // เรียงตาม ID ล่าสุด
                 pageLength: 10,
+                lengthMenu: [
+                    [10, 25, 50, 100, -1],
+                    [10, 25, 50, 100, "ทั้งหมด"]
+                ],
                 language: {
                     search: "ค้นหา:",
                     lengthMenu: "แสดง _MENU_ รายการ",
@@ -288,151 +384,82 @@
                 }
             });
 
-            // ฟังก์ชันสำหรับกรองตามวันที่
-            function filterByDate() {
-                table.ajax.reload();
+            // จัดการเปลี่ยนจำนวนแถวต่อหน้า
+            $('#page-length').change(function() {
+                table.page.len($(this).val()).draw();
+            });
+
+            // ฟังก์ชันสำหรับกรองข้อมูล
+            function applyFilters() {
+                const startDate = $('#date-start').val();
+                const endDate = $('#date-end').val();
+                const meterId = $('#meter-filter').val();
+
+                // สร้าง URL สำหรับดึงข้อมูลใหม่พร้อมพารามิเตอร์
+                let url = '/readings';
+                const params = [];
+
+                if (startDate) params.push(`start_date=${startDate}`);
+                if (endDate) params.push(`end_date=${endDate}`);
+                if (meterId) params.push(`meter_id=${meterId}`);
+
+                if (params.length > 0) {
+                    url += '?' + params.join('&');
+                }
+
+                // อัปเดต URL ของ Ajax request แล้วโหลดข้อมูลใหม่
+                table.ajax.url(url).load();
             }
 
             // เหตุการณ์คลิกปุ่มค้นหาตามวันที่
             $('#apply-date-filter').click(function() {
-                filterByDate();
+                applyFilters();
             });
 
             // เหตุการณ์คลิกปุ่มล้างตัวกรองวันที่
             $('#clear-date-filter').click(function() {
                 $('#date-start').val('');
                 $('#date-end').val('');
-                filterByDate();
+                applyFilters();
             });
 
             // เหตุการณ์คลิกปุ่มกรองตามมิเตอร์
             $('#apply-meter-filter').click(function() {
-                filterByDate();
+                applyFilters();
             });
-
-            // ฟังก์ชันการกรองแบบกำหนดเอง (client-side)
-            $.fn.dataTable.ext.search.push(
-                function(settings, data, dataIndex, rowData, counter) {
-                    // ตรวจสอบก่อนว่ามีการกำหนดวันที่หรือไม่
-                    var startDate = $('#date-start').val();
-                    var endDate = $('#date-end').val();
-                    var meterFilter = $('#meter-filter').val();
-
-                    if (!startDate && !endDate && !meterFilter) {
-                        return true; // ไม่มีการกรอง ให้แสดงทั้งหมด
-                    }
-
-                    var valid = true;
-
-                    // กรองตามวันที่
-                    if (startDate || endDate) {
-                        var dateCreated = new Date(rowData.created_at);
-                        dateCreated.setHours(0, 0, 0, 0); // เซ็ตเวลาให้เป็น 00:00:00
-
-                        if (startDate) {
-                            var minDate = new Date(startDate);
-                            minDate.setHours(0, 0, 0, 0);
-                            if (dateCreated < minDate) {
-                                valid = false;
-                            }
-                        }
-
-                        if (valid && endDate) {
-                            var maxDate = new Date(endDate);
-                            maxDate.setHours(23, 59, 59, 999); // เซ็ตเวลาให้เป็น 23:59:59.999
-                            if (dateCreated > maxDate) {
-                                valid = false;
-                            }
-                        }
-                    }
-
-                    // กรองตามมิเตอร์
-                    if (valid && meterFilter && rowData.meter_id !== meterFilter) {
-                        valid = false;
-                    }
-
-                    return valid;
-                }
-            );
 
             // อัปเดตข้อมูลสรุปสำหรับแต่ละมิเตอร์
             function updateMeterSummary() {
                 $.ajax({
-                    url: '/readings',
+                    url: '/readings/latest',  // ใช้ endpoint ใหม่สำหรับข้อมูลล่าสุดเท่านั้น
                     method: 'GET',
                     success: function(response) {
-                        let meter1Data = null;
-                        console.log(response.data);
-                        let meter2Data = null;
-
-                        // ค้นหาข้อมูลล่าสุดสำหรับแต่ละมิเตอร์
-                        response.data.forEach(function(reading) {
-                            if (reading.meter_id === 'PV31_01' && !meter1Data) {
-                                meter1Data = reading;
-                            } else if (reading.meter_id === 'PV31_02' && !meter2Data) {
-                                meter2Data = reading;
-                            }
-
-                            // หากพบข้อมูลของทั้งสองมิเตอร์แล้ว ก็หยุดการวนลูป
-                            if (meter1Data && meter2Data) {
-                                return false;
-                            }
-                        });
-                        console.log(meter2Data);
-
-
-
                         // อัปเดตข้อมูลสำหรับ Meter 1
-                        if (meter1Data) {
-                            const voltage1 = parseFloat(meter1Data.voltage1);
-                            const voltage2 = parseFloat(meter1Data.voltage2);
-                            const voltage3 = parseFloat(meter1Data.voltage3);
-                            const voltage = (voltage1 + voltage2 + voltage3) / 3;
-                            $('#meter1-voltage').text(voltage.toFixed(2));
+                        if (response.meter1) {
+                            const meter1Data = response.meter1;
+                            const AvgVoltage = meter1Data.voltage1 + meter1Data.voltage2 + meter1Data.voltage3 / 3;
+                            const AvgCurrent = meter1Data.current1 + meter1Data.current2 + meter1Data.current3 / 3;
+                            const AvgPower = meter1Data.power1 + meter1Data.power2 + meter1Data.power3 / 3;
 
-
-                            const current1 = parseFloat(meter1Data.current1);
-                            const current2 = parseFloat(meter1Data.current2);
-                            const current3 = parseFloat(meter1Data.current3);
-                            const current = (current1 + current2 + current3) / 3;
-                            $('#meter1-current').text(current.toFixed(2));
-
-                            const power1 = parseFloat(meter1Data.power1);
-                            const power2 = parseFloat(meter1Data.power2);
-                            const power3 = parseFloat(meter1Data.power3);
-                            const power = (power1 + power2 + power3) / 3;
-                            $('#meter1-power').text(power.toFixed(2));
-
-                            // $('#meter1-energy').text(meter1Data.energy);
-                            // $('#meter1-frequency').text(meter1Data.frequency);
-                            // $('#meter1-pf').text(meter1Data.power_factor);
+                            $('#meter1-voltage').text(AvgVoltage.toFixed(2) || 0);
+                            $('#meter1-current').text(AvgCurrent.toFixed(2) || 0);
+                            $('#meter1-power').text(AvgPower.toFixed(2) || 0);
                         }
 
                         // อัปเดตข้อมูลสำหรับ Meter 2
-                        if (meter2Data) {
-                           const voltage1 = parseFloat(meter2Data.voltage1);
-                            const voltage2 = parseFloat(meter2Data.voltage2);
-                            const voltage3 = parseFloat(meter2Data.voltage3);
-                            const voltage = (voltage1 + voltage2 + voltage3) / 3;
-                            $('#meter2-voltage').text(voltage.toFixed(2));
+                        if (response.meter2) {
+                            const meter2Data = response.meter2;
+                            const AvgVoltage = meter2Data.voltage1 + meter2Data.voltage2 + meter2Data.voltage3 / 3;
+                            const AvgCurrent = meter2Data.current1 + meter2Data.current2 + meter2Data.current3 / 3;
+                            const AvgPower = meter2Data.power1 + meter2Data.power2 + meter2Data.power3 / 3;
 
-
-                            const current1 = parseFloat(meter2Data.current1);
-                            const current2 = parseFloat(meter2Data.current2);
-                            const current3 = parseFloat(meter2Data.current3);
-                            const current = (current1 + current2 + current3) / 3;
-                            $('#meter2-current').text(current.toFixed(2));
-
-                            const power1 = parseFloat(meter2Data.power1);
-                            const power2 = parseFloat(meter2Data.power2);
-                            const power3 = parseFloat(meter2Data.power3);
-                            const power = (power1 + power2 + power3) / 3;
-                            $('#meter2-power').text(power.toFixed(2));
-
-                            // $('#meter2-energy').text(meter2Data.energy);
-                            // $('#meter2-frequency').text(meter2Data.frequency);
-                            // $('#meter2-pf').text(meter2Data.power_factor);
+                            $('#meter2-voltage').text(AvgVoltage.toFixed(2) || 0);
+                            $('#meter2-current').text(AvgCurrent.toFixed(2) || 0);
+                            $('#meter2-power').text(AvgPower.toFixed(2) || 0);
                         }
+                    },
+                    error: function(error) {
+                        console.error('Error fetching meter data:', error);
                     }
                 });
             }

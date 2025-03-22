@@ -15,23 +15,45 @@ class MeterReadingController extends Controller
         $query = MeterReading::query();
 
         // กรองตามวันที่เริ่มต้น
-        if ($request->has('start_date') && $request->start_date) {
+        if ($request->filled('start_date')) {
             $query->whereDate('created_at', '>=', $request->start_date);
         }
 
         // กรองตามวันที่สิ้นสุด
-        if ($request->has('end_date') && $request->end_date) {
+        if ($request->filled('end_date')) {
             $query->whereDate('created_at', '<=', $request->end_date);
         }
 
         // กรองตาม meter_id
-        if ($request->has('meter_id') && $request->meter_id) {
+        if ($request->filled('meter_id')) {
             $query->where('meter_id', $request->meter_id);
         }
 
-        return $query->orderBy('created_at', 'desc')->paginate(15);
-    }
+        // สั่งให้ไม่มีการจำกัดจำนวนแถวที่ดึงมา
+        $readings = $query->orderBy('id', 'desc')->get();
 
+        return response()->json([
+            'data' => $readings
+        ]);
+    }
+    /**
+     * แสดงข้อมูลล่าสุดสำหรับแต่ละมิเตอร์
+     */
+    public function latest()
+    {
+        $meter1 = MeterReading::where('meter_id', 'PV31_01')
+            ->orderBy('id', 'desc')
+            ->first();
+
+        $meter2 = MeterReading::where('meter_id', 'PV31_02')
+            ->orderBy('id', 'desc')
+            ->first();
+
+        return response()->json([
+            'meter1' => $meter1,
+            'meter2' => $meter2
+        ]);
+    }
     /**
      * บันทึกข้อมูลการอ่านมิเตอร์
      */
