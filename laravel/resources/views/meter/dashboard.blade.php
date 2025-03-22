@@ -1,6 +1,7 @@
 <!-- resources/views/meter/dashboard.blade.php -->
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,19 +17,23 @@
             padding: 20px 0;
             margin-bottom: 30px;
         }
+
         .meter-card {
             border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             margin-bottom: 20px;
             transition: transform 0.3s;
         }
+
         .meter-card:hover {
             transform: translateY(-5px);
         }
+
         .card-header {
             border-radius: 10px 10px 0 0 !important;
             font-weight: bold;
         }
+
         .pv31-icon {
             width: 40px;
             height: 40px;
@@ -42,6 +47,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="header-bg">
         <div class="container">
@@ -70,9 +76,9 @@
                                 <h5>power: <span id="meter1-power">0</span> W</h5>
                             </div>
                             <div class="col-6">
-                                <h5>energy: <span id="meter1-energy">0</span> kWh</h5>
+                                {{-- <h5>energy: <span id="meter1-energy">0</span> kWh</h5>
                                 <h5>frequency: <span id="meter1-frequency">0</span> Hz</h5>
-                                <h5>PF: <span id="meter1-pf">0</span></h5>
+                                <h5>PF: <span id="meter1-pf">0</span></h5> --}}
                             </div>
                         </div>
                     </div>
@@ -93,9 +99,9 @@
                                 <h5>power: <span id="meter2-power">0</span> W</h5>
                             </div>
                             <div class="col-6">
-                                <h5>energy: <span id="meter2-energy">0</span> kWh</h5>
+                                {{-- <h5>energy: <span id="meter2-energy">0</span> kWh</h5>
                                 <h5>frequency: <span id="meter2-frequency">0</span> Hz</h5>
-                                <h5>PF: <span id="meter2-pf">0</span></h5>
+                                <h5>PF: <span id="meter2-pf">0</span></h5> --}}
                             </div>
                         </div>
                     </div>
@@ -150,9 +156,15 @@
                                     <tr>
                                         <th>ID</th>
                                         <th>Meter ID</th>
-                                        <th>Voltage (V)</th>
-                                        <th>Current (A)</th>
-                                        <th>Power (W)</th>
+                                        <th>Voltage1 (V)</th>
+                                        <th>Voltage2 (V)</th>
+                                        <th>Voltage3 (V)</th>
+                                        <th>Current1 (A)</th>
+                                        <th>Current2 (A)</th>
+                                        <th>Current3 (A)</th>
+                                        <th>Power1 (W)</th>
+                                        <th>Power2 (W)</th>
+                                        <th>Power3 (W)</th>
                                         <th>Energy (kWh)</th>
                                         <th>Frequency (Hz)</th>
                                         <th>Power Factor</th>
@@ -201,15 +213,48 @@
                         return d;
                     }
                 },
-                columns: [
-                    { data: 'id' },
-                    { data: 'meter_id' },
-                    { data: 'voltage' },
-                    { data: 'current' },
-                    { data: 'power' },
-                    { data: 'energy' },
-                    { data: 'frequency' },
-                    { data: 'power_factor' },
+                columns: [{
+                        data: 'id'
+                    },
+                    {
+                        data: 'meter_id'
+                    },
+                    {
+                        data: 'voltage1'
+                    },
+                    {
+                        data: 'voltage2'
+                    },
+                    {
+                        data: 'voltage3'
+                    },
+                    {
+                        data: 'current1'
+                    },
+                    {
+                        data: 'current2'
+                    },
+                    {
+                        data: 'current3'
+                    },
+                    {
+                        data: 'power1'
+                    },
+                    {
+                        data: 'power2'
+                    },
+                    {
+                        data: 'power3'
+                    },
+                    {
+                        data: 'energy'
+                    },
+                    {
+                        data: 'frequency'
+                    },
+                    {
+                        data: 'power_factor'
+                    },
                     {
                         data: 'created_at',
                         render: function(data) {
@@ -224,7 +269,9 @@
                         }
                     }
                 ],
-                order: [[0, 'desc']], // เรียงตาม ID ล่าสุด
+                order: [
+                    [0, 'desc']
+                ], // เรียงตาม ID ล่าสุด
                 pageLength: 10,
                 language: {
                     search: "ค้นหา:",
@@ -315,6 +362,7 @@
                     method: 'GET',
                     success: function(response) {
                         let meter1Data = null;
+                        console.log(response.data);
                         let meter2Data = null;
 
                         // ค้นหาข้อมูลล่าสุดสำหรับแต่ละมิเตอร์
@@ -330,25 +378,60 @@
                                 return false;
                             }
                         });
+                        console.log(meter2Data);
+
+
 
                         // อัปเดตข้อมูลสำหรับ Meter 1
                         if (meter1Data) {
-                            $('#meter1-voltage').text(meter1Data.voltage);
-                            $('#meter1-current').text(meter1Data.current);
-                            $('#meter1-power').text(meter1Data.power);
-                            $('#meter1-energy').text(meter1Data.energy);
-                            $('#meter1-frequency').text(meter1Data.frequency);
-                            $('#meter1-pf').text(meter1Data.power_factor);
+                            const voltage1 = parseFloat(meter1Data.voltage1);
+                            const voltage2 = parseFloat(meter1Data.voltage2);
+                            const voltage3 = parseFloat(meter1Data.voltage3);
+                            const voltage = (voltage1 + voltage2 + voltage3) / 3;
+                            $('#meter1-voltage').text(voltage.toFixed(2));
+
+
+                            const current1 = parseFloat(meter1Data.current1);
+                            const current2 = parseFloat(meter1Data.current2);
+                            const current3 = parseFloat(meter1Data.current3);
+                            const current = (current1 + current2 + current3) / 3;
+                            $('#meter1-current').text(current.toFixed(2));
+
+                            const power1 = parseFloat(meter1Data.power1);
+                            const power2 = parseFloat(meter1Data.power2);
+                            const power3 = parseFloat(meter1Data.power3);
+                            const power = (power1 + power2 + power3) / 3;
+                            $('#meter1-power').text(power.toFixed(2));
+
+                            // $('#meter1-energy').text(meter1Data.energy);
+                            // $('#meter1-frequency').text(meter1Data.frequency);
+                            // $('#meter1-pf').text(meter1Data.power_factor);
                         }
 
                         // อัปเดตข้อมูลสำหรับ Meter 2
                         if (meter2Data) {
-                            $('#meter2-voltage').text(meter2Data.voltage);
-                            $('#meter2-current').text(meter2Data.current);
-                            $('#meter2-power').text(meter2Data.power);
-                            $('#meter2-energy').text(meter2Data.energy);
-                            $('#meter2-frequency').text(meter2Data.frequency);
-                            $('#meter2-pf').text(meter2Data.power_factor);
+                           const voltage1 = parseFloat(meter2Data.voltage1);
+                            const voltage2 = parseFloat(meter2Data.voltage2);
+                            const voltage3 = parseFloat(meter2Data.voltage3);
+                            const voltage = (voltage1 + voltage2 + voltage3) / 3;
+                            $('#meter2-voltage').text(voltage.toFixed(2));
+
+
+                            const current1 = parseFloat(meter2Data.current1);
+                            const current2 = parseFloat(meter2Data.current2);
+                            const current3 = parseFloat(meter2Data.current3);
+                            const current = (current1 + current2 + current3) / 3;
+                            $('#meter2-current').text(current.toFixed(2));
+
+                            const power1 = parseFloat(meter2Data.power1);
+                            const power2 = parseFloat(meter2Data.power2);
+                            const power3 = parseFloat(meter2Data.power3);
+                            const power = (power1 + power2 + power3) / 3;
+                            $('#meter2-power').text(power.toFixed(2));
+
+                            // $('#meter2-energy').text(meter2Data.energy);
+                            // $('#meter2-frequency').text(meter2Data.frequency);
+                            // $('#meter2-pf').text(meter2Data.power_factor);
                         }
                     }
                 });
@@ -371,4 +454,5 @@
         });
     </script>
 </body>
+
 </html>
